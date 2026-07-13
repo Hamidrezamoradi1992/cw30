@@ -15,12 +15,7 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    owner_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='archive_category',
-        verbose_name=_('Owner User')
-    )
+    owner_user = models.CharField(max_length=80, )
     name = models.CharField(max_length=120, verbose_name=_('Name'))
 
     class Meta:
@@ -48,12 +43,7 @@ class File(models.Model):
         # Archives
         'zip', 'rar', '7z'
     ]
-    owner_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='file_owner_user',
-        verbose_name=_('Owner User')
-    )
+    owner_user = models.CharField(max_length=80, )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -61,11 +51,7 @@ class File(models.Model):
         related_name='archive_file_category',
         verbose_name=_('Category')
     )
-    owner = models.ForeignKey(User,
-                              on_delete=models.SET_NULL,
-                              null=True,
-                              related_name="file_owner",
-                              verbose_name=_('Owner'))
+    owner = models.CharField(max_length=80, )
     name = models.CharField(max_length=1024,
                             blank=True,
                             null=True,
@@ -182,16 +168,9 @@ class Action(models.TextChoices):
 
 
 class FileDownloadLog(models.Model):
-    owner_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='download_logs_owner_user',
-        verbose_name=_('Owner User')
-    )
+    owner_user = models.CharField(max_length=80, )
     file = models.CharField(max_length=180)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE,
-                                related_name="download_logs_user_id",
-                                verbose_name=_('User ID'))
+    user_id = models.CharField(max_length=80, )
     downloaded_at = models.DateTimeField(auto_now_add=True,
                                          verbose_name=_('Downloaded At'))
     action = models.CharField(
