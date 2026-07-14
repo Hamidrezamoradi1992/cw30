@@ -16,7 +16,6 @@ User = get_user_model()
 
 class Category(models.Model):
     name = models.CharField(max_length=120, verbose_name=_('Name'))
-
     class Meta:
         ordering = ['id']
         verbose_name = _('Category')
@@ -85,7 +84,7 @@ class File(models.Model):
         if self.file:
             self.clean()
             # Calculate total used storage and check against max storage
-            total_used = self.total_available(owner_user=self.owner_user)
+            total_used = self.total_available()
             storage = settings.MAX_STORAGE * 1_000_000_000  # Convert GB to bytes
             max_free = storage - total_used
             file_size = self.file.size
@@ -102,14 +101,14 @@ class File(models.Model):
 
         super().save(*args, **kwargs)
 
-    def total_available(self, owner_user: object):
+    def total_available(self):
         """
         Calculate the total size of all files.
         """
         total = File.objects.all().aggregate(total_size=Sum('size'))['total_size'] or 0
         return total
 
-    def get_storage_details(self, owner_user: object) -> dict:
+    def get_storage_details(self) -> dict:
         """
         Calculate storage details (total, word, excel, pdf, free) in one query.
         """
@@ -165,7 +164,6 @@ class Action(models.TextChoices):
 
 
 class FileDownloadLog(models.Model):
-    owner_user = models.CharField(max_length=180 ,help_text=_("pleas send name user this field"))
     file = models.CharField(max_length=180)
     user_id = models.CharField(max_length=80, )
     downloaded_at = models.DateTimeField(auto_now_add=True,
