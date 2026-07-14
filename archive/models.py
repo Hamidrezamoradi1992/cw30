@@ -15,12 +15,6 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    owner_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='archive_category',
-        verbose_name=_('Owner User')
-    )
     name = models.CharField(max_length=120, verbose_name=_('Name'))
 
     class Meta:
@@ -48,12 +42,6 @@ class File(models.Model):
         # Archives
         'zip', 'rar', '7z'
     ]
-    owner_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='file_owner_user',
-        verbose_name=_('Owner User')
-    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -61,11 +49,6 @@ class File(models.Model):
         related_name='archive_file_category',
         verbose_name=_('Category')
     )
-    owner = models.ForeignKey(User,
-                              on_delete=models.SET_NULL,
-                              null=True,
-                              related_name="file_owner",
-                              verbose_name=_('Owner'))
     name = models.CharField(max_length=1024,
                             blank=True,
                             null=True,
@@ -102,7 +85,7 @@ class File(models.Model):
         if self.file:
             self.clean()
             # Calculate total used storage and check against max storage
-            total_used = self.total_available(owner_user=self.owner_user)
+            total_used = self.total_available()
             storage = settings.MAX_STORAGE * 1_000_000_000  # Convert GB to bytes
             max_free = storage - total_used
             file_size = self.file.size
@@ -119,7 +102,7 @@ class File(models.Model):
 
         super().save(*args, **kwargs)
 
-    def total_available(self, owner_user: object):
+    def total_available(self):
         """
         Calculate the total size of all files.
         """
@@ -182,12 +165,7 @@ class Action(models.TextChoices):
 
 
 class FileDownloadLog(models.Model):
-    owner_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='download_logs_owner_user',
-        verbose_name=_('Owner User')
-    )
+    owner_user = models.CharField(max_length=180 ,help_text=_("pleas send name user this field"))
     file = models.CharField(max_length=180)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE,
                                 related_name="download_logs_user_id",
