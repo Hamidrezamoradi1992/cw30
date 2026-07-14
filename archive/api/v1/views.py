@@ -1,7 +1,6 @@
 from django.conf import settings
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter, OrderingFilter
 
 from rest_framework.response import Response
 from archive.api.v1.serializers import *
@@ -117,7 +116,7 @@ class ListFileArchiveViewSet(viewsets.ModelViewSet):
 
 class DetailerStorageViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all()
-    serializer_class = FileDietaileResponseSerializer
+    serializer_class = FileDetailerResponseSerializer
 
 
 
@@ -140,8 +139,8 @@ class DetailerStorageViewSet(viewsets.ModelViewSet):
             'excel_available': {'total': excel_available, 'color': '#3479E0'},
             'pdf_available': {'total': pdf_available, 'color': '#E03434'},
             'other_type': {'total': other_type, 'color': "#E034D5"},
-            # 'detail' :""
+
         }
-        serializer = FileDietaileResponseSerializer(data=response_data)
+        serializer = FileDetailerResponseSerializer(data=response_data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
